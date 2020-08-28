@@ -16,7 +16,7 @@ def sentiment(pData, Desc):
                                            'subjectivity':subjectivity,
                                            'Remarks':reindexed_data.index},
                                           index=reindexed_data.index)
-        sentiment_analysed.to_excel('AnalyzedData.xlsx',index=False)
+        sentiment_analysed.to_excel('./output/AnalyzedData.xlsx',index=False)
     except Exception as e:
         print('Error ocurred due to template')
         print(traceback.format_exc())

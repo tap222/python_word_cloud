@@ -1,14 +1,15 @@
-# importing all necessery modules 
-from wordcloud import WordCloud, STOPWORDS 
-import matplotlib.pyplot as plt 
-import pandas as pd 
 import traceback
+import pandas as pd 
+import matplotlib.pyplot as plt 
+from wordcloud import WordCloud, STOPWORDS 
 
 def plotwordcloud(pData, Desc):
     try:
+        pData = pData.reset_index()
+        pData = pData[~pData.Sample.str.contains("nan")]
         pDescWords = '' 
         # iterate through the csv file 
-        for val in pData[Desc]: 
+        for val in pData.Sample: 
               
             # typecaste each val to string 
             val = str(val) 
@@ -29,10 +30,10 @@ def plotwordcloud(pData, Desc):
         print(wordcloud)
         fig = plt.figure(figsize = (12,14))
         plt.imshow(wordcloud)
-        plt.title(" Custtomer Remarks",fontsize=25)
+        plt.title(" Customer Remarks",fontsize=25)
         plt.axis('off')
         #plt.show()
-        plt.savefig('wordcloud.png')
+        plt.savefig('./output/wordcloud.png')
     except Exception as e:
         print('Error ocurred wordcloud file')
         print(traceback.format_exc())
