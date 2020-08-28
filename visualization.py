@@ -94,13 +94,13 @@ def plotFreqngram(pData, n, ngram):
         return(-1)
     return (0)
     
-def plotngramnetwork(pData, n, pNodeName):
+def plotngramnetwork(pData, pNodeName):
     try:
         pData = pData.reset_index()
-        pData = pData[~pData.Sample.str.contains("nan")]
+        pData = pData[~pData['Sample'].str.contains("nan",na=False)]
         pDescWords = '' 
         #iterate through the csv file 
-        for val in pData.Sample: 
+        for val in pData['Sample']: 
               
             #typecaste each val to string 
             val = str(val) 
@@ -115,7 +115,7 @@ def plotngramnetwork(pData, n, pNodeName):
         # Create counter of words in clean bigrams
         bigram_counts = collections.Counter(terms_bigram)
         
-        bigram_df = pd.DataFrame(bigram_counts.most_common(int(n)), columns=['ngram', 'count'])
+        bigram_df = pd.DataFrame(bigram_counts.most_common(int(20)), columns=['ngram', 'count'])
         # Create dictionary of bigrams and their counts
         d = bigram_df.set_index('ngram').T.to_dict('records')
         
