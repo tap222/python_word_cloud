@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 from wordcloud import WordCloud, STOPWORDS 
 
-def plotwordcloud(pData, Desc):
+def plotwordcloud(pData, Desc, filename):
     try:
         pData = pData.reset_index()
         pData = pData[~pData.Sample.str.contains("nan")]
@@ -12,10 +12,10 @@ def plotwordcloud(pData, Desc):
         for val in pData.Sample: 
               
             # typecaste each val to string 
-            val = str(val) 
+            val = str(val)
           
             # split the value 
-            tokens = val.split() 
+            tokens = val.split()
                     
             pDescWords += " ".join(tokens)+" "
           
@@ -23,17 +23,17 @@ def plotwordcloud(pData, Desc):
                             max_words=300,
                             max_font_size=200, 
                             width=1000, height=800,
-                            random_state=42,
+                            random_state=42,collocations=False
                             ).generate(pDescWords) 
           
         # plot the WordCloud image                        
-        print(wordcloud)
         fig = plt.figure(figsize = (12,14))
         plt.imshow(wordcloud)
-        plt.title(" Customer Remarks",fontsize=25)
+        plt.title(str(filename), fontsize=25)
         plt.axis('off')
         #plt.show()
-        plt.savefig('./output/wordcloud.png')
+        plt.savefig('./output/wordcloud' + str(filename) + '.png')
+        
     except Exception as e:
         print('Error ocurred wordcloud file')
         print(traceback.format_exc())

@@ -2,7 +2,7 @@ from textblob import TextBlob
 import traceback
 import pandas as pd
 
-def sentiment(pData, Desc):
+def sentiment(pData, Desc, filename):
     try:
         reindexed_data = pData['Sample']
         reindexed_data.index = pData[Desc]
@@ -16,7 +16,7 @@ def sentiment(pData, Desc):
                                            'subjectivity':subjectivity,
                                            'Remarks':reindexed_data.index},
                                           index=reindexed_data.index)
-        sentiment_analysed.to_excel('./output/AnalyzedData.xlsx',index=False)
+        sentiment_analysed.to_excel('./output/AnalyzedData' + str(filename) + '.xlsx',index=False)
     except Exception as e:
         print('Error ocurred due to template')
         print(traceback.format_exc())
