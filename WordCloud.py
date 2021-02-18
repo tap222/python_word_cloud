@@ -5,8 +5,6 @@ from wordcloud import WordCloud, STOPWORDS
 
 def plotwordcloud(pData, Desc, filename):
     try:
-        pData = pData.reset_index()
-        pData = pData[~pData.Sample.str.contains("nan")]
         pDescWords = '' 
         # iterate through the csv file 
         for val in pData.Sample: 

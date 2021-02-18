@@ -5,6 +5,7 @@ import visualization #it is represnting top keywords
 import preprocessing # pre-processing file
 
 import traceback 
+import numpy as np
 import pandas as pd
 
 Desc = config.desc
@@ -14,9 +15,15 @@ pNodeName = config.NodeName
 pSubUnit = config.subunit
 pFileName = config.FileName
 
-def main(pData, Desc, sntmnt=False, wrdcld=True, viz=True, Market=False):
+def main(pData, Desc, sntmnt=False, wrdcld=True, viz=True, Market=False, is_preprocess = False):
     try: 
-        lstatusPreprocessing,pDataProcess = preprocessing.preprocess(pData, Desc)
+        if is_preprocess:
+            lstatusPreprocessing,pDataProcess = preprocessing.preprocess(pData, Desc)
+            pDataProcess = pDataProcess.reset_index()
+            pDataProcess = pDataProcess[~pDataProcess.Sample.str.contains("nan", regex=False, na=False)]
+        else:
+            pDataProcess = pData
+            pDataProcess['Sample'] = pDataProcess[Desc]
         if Market:
             pMarketUnitList = pDataProcess[pSubUnit].unique().tolist()
             for index in range(len(pMarketUnitList)):

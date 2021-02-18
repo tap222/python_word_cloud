@@ -14,8 +14,6 @@ warnings.filterwarnings("ignore")
 
 def plotmostfrqKwds(pData, n, filename):
     try:
-        pData = pData.reset_index()
-        pData = pData[~pData.Sample.str.contains("nan")]
         pDescWords = '' 
         #iterate through the csv file 
         for val in pData.Sample: 
@@ -29,9 +27,13 @@ def plotmostfrqKwds(pData, n, filename):
         X = vect.fit_transform([pDescWords])
         #zipping actual words and sum of their Tfidf for corpus
         features_rank = list(zip(vect.get_feature_names(), [x[0] for x in X.sum(axis=0).T.tolist()]))
-
         # sorting
         features_rank = np.array(sorted(features_rank, key = lambda x:x[1], reverse=True))
+        pFeaturesDf = pd.DataFrame(features_rank, columns=['Keyword', 'Relevance'])
+        pFeaturesDf['Relevance'] = pFeaturesDf['Relevance'].astype('float').apply(lambda x: round(x, 3))
+        pFeaturesDf.to_excel('./output/Relevance' + str(filename) + '.xlsx', index = False)
+        
+        #Plotting
         plt.figure(figsize = (12,14))
         plt.barh(-np.arange(int(n)), features_rank[:int(n), 1].astype(float), height=.8)
         plt.yticks(ticks=-np.arange(int(n)), labels = features_rank[:int(n), 0])
@@ -46,8 +48,6 @@ def plotmostfrqKwds(pData, n, filename):
     
 def plottablefrqKwds(pData, n, filename):
     try:
-        pData = pData.reset_index()
-        pData = pData[~pData.Sample.str.contains("nan")]
         pDescWords = pData.Sample.str.cat(sep=' ')
         pWords = nltk.tokenize.word_tokenize(pDescWords)
         pWordDist = nltk.FreqDist(pWords)
@@ -60,13 +60,24 @@ def plottablefrqKwds(pData, n, filename):
         return(-1)
     return(0)       
     
-def get_top_ngram(corpus, n, ngram):
+def get_top_ngram(corpus, n, ngram, filename):
     try:
-        vec = CountVectorizer(ngram_range = (int(ngram), int(ngram)) ).fit(corpus)
-        pBagOfWords = vec.transform(corpus)
+        vec = CountVectorizer(ngram_range = (int(ngram), int(ngram)), analyzer = 'word' ).fit(corpus)
+        pBagOfWords = vec.fit_transform(corpus)
         pSumWords = pBagOfWords.sum(axis=0) 
         pWordsFreq = [(word, pSumWords[0, idx]) for word, idx in vec.vocabulary_.items()]
         pWordsFreq =sorted(pWordsFreq, key = lambda x: x[1], reverse=True)
+        
+        #Relevance score with TF-IDF
+        vect = TfidfVectorizer(ngram_range = (int(ngram), int(ngram)), analyzer = 'word')
+        X = vect.fit_transform(corpus)
+        #zipping actual words and sum of their Tfidf for corpus
+        features_rank = list(zip(vect.get_feature_names(), [x[0] for x in X.sum(axis=0).T.tolist()]))
+        # sorting
+        features_rank = np.array(sorted(features_rank, key = lambda x:x[1], reverse=True))
+        pFeaturesDf = pd.DataFrame(features_rank, columns=['Keyword', 'Relevance'])
+        pFeaturesDf['Relevance'] = pFeaturesDf['Relevance'].astype('float').apply(lambda x: round(x, 3))
+        pFeaturesDf.to_excel('./output/RelevanceNgram' + str(filename) + '.xlsx', index = False)
         
     except Exception as e:
         print('Error[003] ocurred visualization file while getting top n grams')
@@ -77,8 +88,6 @@ def get_top_ngram(corpus, n, ngram):
 
 def plotFreqngram(pData, n, ngram, filename):
     try:
-        pData = pData.reset_index()
-        pData = pData[~pData.Sample.str.contains("nan")]
         pDescWords = '' 
         #iterate through the csv file 
         for val in pData.Sample:  
@@ -87,8 +96,8 @@ def plotFreqngram(pData, n, ngram, filename):
             # split the value 
             tokens = val.split() 
             pDescWords += " ".join(tokens)+" "
-            
-        common_words = get_top_ngram([pDescWords], n, ngram)
+ 
+        common_words = get_top_ngram([pDescWords], n, ngram, filename)
         fig, ax = plt.subplots(figsize=(20, 20))
         pNgramDf = pd.DataFrame(common_words, columns = ['NgramKeyword' , 'count'])
         pNgramDf.to_excel('./output/Ngrarm' + str(filename) + '.xlsx', index = False)
@@ -104,8 +113,6 @@ def plotFreqngram(pData, n, ngram, filename):
     
 def plotngramnetwork(pData, pNodeName, filename):
     try:
-        pData = pData.reset_index()
-        pData = pData[~pData['Sample'].str.contains("nan",na=False)]
         pDescWords = '' 
         #iterate through the csv file 
         for val in pData['Sample']: 
